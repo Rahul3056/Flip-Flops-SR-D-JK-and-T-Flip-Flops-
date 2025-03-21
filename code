@@ -1,0 +1,92 @@
+### **Verilog Code for Flip-Flops**
+```verilog
+// SR Flip-Flop
+module sr_flipflop (
+    input S, R, clk,
+    output reg Q
+);
+    always @(posedge clk) begin
+        case ({S, R})
+            2'b00: Q <= Q;   // Hold
+            2'b01: Q <= 0;   // Reset
+            2'b10: Q <= 1;   // Set
+            2'b11: Q <= 1'bx; // Invalid
+        endcase
+    end
+endmodule
+
+// D Flip-Flop
+module d_flipflop (
+    input D, clk,
+    output reg Q
+);
+    always @(posedge clk)
+        Q <= D;
+endmodule
+
+// JK Flip-Flop
+module jk_flipflop (
+    input J, K, clk,
+    output reg Q
+);
+    always @(posedge clk) begin
+        case ({J, K})
+            2'b00: Q <= Q;   // Hold
+            2'b01: Q <= 0;   // Reset
+            2'b10: Q <= 1;   // Set
+            2'b11: Q <= ~Q;  // Toggle
+        endcase
+    end
+endmodule
+
+// T Flip-Flop
+module t_flipflop (
+    input T, clk,
+    output reg Q
+);
+    always @(posedge clk)
+        if (T) Q <= ~Q;  // Toggle
+endmodule
+
+// Testbench
+module testbench;
+    reg clk, S, R, D, J, K, T;
+    wire Q_sr, Q_d, Q_jk, Q_t;
+
+    sr_flipflop sr_ff(.S(S), .R(R), .clk(clk), .Q(Q_sr));
+    d_flipflop d_ff(.D(D), .clk(clk), .Q(Q_d));
+    jk_flipflop jk_ff(.J(J), .K(K), .clk(clk), .Q(Q_jk));
+    t_flipflop t_ff(.T(T), .clk(clk), .Q(Q_t));
+
+    initial begin
+        clk = 0;
+        forever #5 clk = ~clk;  // Clock toggle every 5 time units
+    end
+
+    initial begin
+        // Test SR Flip-Flop
+        S = 1; R = 0; #10;
+        S = 0; R = 1; #10;
+        S = 0; R = 0; #10;
+        S = 1; R = 1; #10;
+
+        // Test D Flip-Flop
+        D = 1; #10;
+        D = 0; #10;
+
+        // Test JK Flip-Flop
+        J = 1; K = 0; #10;
+        J = 0; K = 1; #10;
+        J = 1; K = 1; #10;
+
+        // Test T Flip-Flop
+        T = 1; #10;
+        T = 0; #10;
+        T = 1; #10;
+
+        $finish;
+    end
+endmodule
+```
+
+---
